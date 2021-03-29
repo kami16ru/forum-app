@@ -22,17 +22,24 @@
 
       <div class="post-content">
         <div>
-          <p>{{ postById(post.id).text }}</p>
+          <p>{{ post.text }}</p>
         </div>
       </div>
 
-      <div class="post-date text-faded">{{ postById(post.id).publishedAt }}</div>
+      <div class="post-date text-faded" :title="humanFriendlyDate(post.publishedAt)">
+        {{ diffForHumans(post.publishedAt) }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import sourceData from '@/data.json'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import localizedDate from 'dayjs/plugin/localizedFormat'
+dayjs.extend(relativeTime)
+dayjs.extend(localizedDate)
 
 export default {
   name: 'PostList',
@@ -48,11 +55,14 @@ export default {
     }
   },
   methods: {
-    postById (postId) {
-      return this.posts.find(p => p.id === postId)
-    },
     userById (userId) {
       return this.users.find(u => u.id === userId)
+    },
+    diffForHumans (timestamp) {
+      return dayjs.unix(timestamp).fromNow()
+    },
+    humanFriendlyDate (timestamp) {
+      return dayjs.unix(timestamp).format('llll')
     }
   }
 }
