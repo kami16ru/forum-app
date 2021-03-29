@@ -31,13 +31,8 @@
 </template>
 
 <script>
-import AppDate from '@/components/AppDate'
-
 export default {
   name: 'ThreadItem',
-  components: {
-    AppDate
-  },
   props: {
     thread: {
       type: Object,
