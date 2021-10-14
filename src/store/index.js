@@ -30,6 +30,9 @@ export default createStore({
     }
   },
   actions: {
+    updateUser ({ commit }, user) {
+      commit('setUser', { user, userId: user.id })
+    },
     createPost (context, post) {
       post.id = 'qqqq' + Math.random()
 
@@ -39,6 +42,11 @@ export default createStore({
     }
   },
   mutations: {
+    setUser (state, { user, userId }) {
+      const userIndex = state.users.findIndex(user => user.id === userId)
+
+      state.users[userIndex] = user
+    },
     setPost (state, { post }) {
       state.posts.push(post)
     },
