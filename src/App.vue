@@ -1,8 +1,12 @@
 <template>
+
   <the-navbar/>
-    <div class="container">
-      <router-view/>
-    </div>
+
+  <div class="container">
+
+    <router-view/>
+
+  </div>
 </template>
 
 <script>

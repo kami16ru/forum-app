@@ -4,6 +4,7 @@ import Forum from '@/pages/Forum'
 import NotFound from '@/pages/NotFound'
 import Category from '@/pages/Category'
 import store from '@/store'
+import Profile from '@/pages/Profile'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -11,6 +12,10 @@ const routes = [{
   path: '/',
   name: 'Home',
   component: Home
+}, {
+  path: '/me',
+  name: 'Profile',
+  component: Profile
 }, {
   path: '/category/:id',
   name: 'Category',
