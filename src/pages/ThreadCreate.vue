@@ -38,8 +38,8 @@ import { mapActions } from 'vuex'
 
 export default {
   props: {
-    forum: {
-      type: Object,
+    forumId: {
+      type: String,
       required: true
     }
   },
@@ -49,12 +49,17 @@ export default {
       text: ''
     }
   },
+  computed: {
+    forum () {
+      return this.$store.state.forums.find(forum => forum.id === this.forumId)
+    }
+  },
   methods: {
     ...mapActions({
       createThread: 'createThread'
     }),
     save () {
-      this.createThread({
+      this.$store.dispatch('createThread', {
         title: this.title,
         text: this.text,
         forumId: this.forum.id

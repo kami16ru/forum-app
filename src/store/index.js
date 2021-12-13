@@ -47,7 +47,7 @@ export default createStore({
       const publishedAt = Math.floor(Date.now() / 1000)
       const thread = { forumId, title, publishedAt, userId, id }
 
-      commit('setThread', thread)
+      commit('setThread', { thread })
       commit('appendThreadToUser', { threadId: id, userId })
       commit('appendThreadToForum', { threadId: id, forumId })
       dispatch('createPost', { text, threadId: id })
