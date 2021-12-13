@@ -27,7 +27,7 @@
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-ghost">Cancel</button>
+        <button @click.prevent="cancel" class="btn btn-ghost">Cancel</button>
         <button class="btn btn-blue" type="submit" name="Publish">Publish </button>
       </div>
     </form>
@@ -58,11 +58,26 @@ export default {
     ...mapActions({
       createThread: 'createThread'
     }),
-    save () {
-      this.$store.dispatch('createThread', {
+    async save () {
+      const thread = await this.createThread({
         title: this.title,
         text: this.text,
         forumId: this.forum.id
+      })
+
+      await this.$router.push({
+        name: 'ThreadShow',
+        params: {
+          id: thread.id
+        }
+      })
+    },
+    cancel () {
+      this.$router.push({
+        name: 'Forum',
+        params: {
+          id: this.forum.id
+        }
       })
     }
   }
