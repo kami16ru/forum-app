@@ -34,6 +34,8 @@
   </div>
 </template>
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   props: {
     forum: {
@@ -48,8 +50,15 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      createThread: 'createThread'
+    }),
     save () {
-      // dispatch vuex action
+      this.createThread({
+        title: this.title,
+        text: this.text,
+        forumId: this.forum.id
+      })
     }
   }
 }
