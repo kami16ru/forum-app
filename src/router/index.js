@@ -68,7 +68,7 @@ const routes = [{
   props: true
 }, {
   path: '/thread/:id/edit',
-  name: 'ThreadCreate',
+  name: 'ThreadEdit',
   component: ThreadEdit,
   props: true
 }, {

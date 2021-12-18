@@ -24,7 +24,7 @@
 
     <div class="btn-group">
       <button @click.prevent="$emit('cancel')" class="btn btn-ghost">Cancel</button>
-      <button class="btn btn-blue" type="submit" name="Publish">Publish </button>
+      <button class="btn btn-blue" type="submit" name="Publish">{{ existing ? 'Update' : 'Publish' }}</button>
     </div>
   </form>
 </template>
@@ -49,6 +49,11 @@ export default {
         title: this.title,
         text: this.text
       }
+    }
+  },
+  computed: {
+    existing () {
+      return !!this.title
     }
   },
   methods: {
