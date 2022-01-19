@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 import sourceData from '@/data'
 import { findById, updateOrInsert } from '@/helpers'
 
-createStore({
+export default createStore({
   state: {
     ...sourceData,
     authId: 'VXjpr2WHa8Ux4Bnggym8QFLdv5C3'
