@@ -4,7 +4,12 @@
 
       <h2 class="list-title">Threads</h2>
 
-      <ThreadItem v-for="thread in threads" :key="thread.id" :thread="thread" :users="users" />
+      <ThreadItem
+        v-for="thread in threads"
+        :key="thread.id"
+        :thread="thread"
+        :users="users"
+      />
 
     </div>
   </div>
