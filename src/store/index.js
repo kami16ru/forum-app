@@ -1,10 +1,13 @@
 import { createStore } from 'vuex'
-import sourceData from '@/data'
 import { findById, updateOrInsert } from '@/helpers'
 
 export default createStore({
   state: {
-    ...sourceData,
+    categories: [],
+    forums: [],
+    threads: [],
+    posts: [],
+    users: [],
     authId: 'VXjpr2WHa8Ux4Bnggym8QFLdv5C3'
   },
   getters: {
@@ -92,10 +95,8 @@ export default createStore({
     }
   },
   mutations: {
-    setUser (state, { user, userId }) {
-      const userIndex = state.users.findIndex(user => user.id === userId)
-
-      state.users[userIndex] = user
+    setUser (state, { user }) {
+      updateOrInsert(state.users, user)
     },
     setPost (state, { post }) {
       updateOrInsert(state.posts, post)
