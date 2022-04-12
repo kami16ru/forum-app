@@ -10,7 +10,7 @@
     </h1>
 
     <p>
-      By <a href="#" class="link-unstyled">{{ thread.author.name }}</a>, <AppDate :timestamp="thread.publishedAt" />.
+      By <a href="#" class="link-unstyled">{{ thread.author?.name }}</a>, <AppDate v-if="thread.publishedAt" :timestamp="thread.publishedAt" />.
       <span style="float:right; margin-top: 2px;" class="hide-mobile text-faded text-small">
         {{ `${thread.repliesCount} replies by ${thread.contributorsCount} contributors` }}
       </span>
@@ -28,6 +28,9 @@
 import PostList from '@/components/PostList'
 import PostEditor from '@/components/PostEditor'
 import AppDate from '@/components/AppDate'
+
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/plugins/firebase'
 
 export default {
   name: 'PageThreadShow',
@@ -64,6 +67,47 @@ export default {
       }
 
       this.$store.dispatch('createPost', post)
+    }
+  },
+  async created () {
+    const threadDocRef = doc(db, 'threads', this.id)
+    const threadDocSnap = await getDoc(threadDocRef)
+
+    if (threadDocSnap.exists()) {
+      const thread = { ...threadDocSnap.data(), id: threadDocSnap.id }
+
+      this.$store.commit('setThread', { thread })
+
+      const userDocRef = doc(db, 'users', thread.userId)
+      const userDocSnap = await getDoc(userDocRef)
+
+      if (userDocSnap.exists()) {
+        const user = { ...userDocSnap.data(), id: userDocSnap.id }
+
+        this.$store.commit('setUser', { user })
+      } else {
+        console.log('No such document!')
+      }
+
+      thread.posts.forEach((postId) => {
+        const postDocRef = doc(db, 'posts', postId)
+
+        getDoc(postDocRef).then((postDocSnap) => {
+          const post = { ...postDocSnap.data(), id: postDocSnap.id }
+
+          this.$store.commit('setPost', { post })
+
+          const userDocRef = doc(db, 'users', post.userId)
+
+          getDoc(userDocRef).then((userDocSnap) => {
+            const user = { ...userDocSnap.data(), id: userDocSnap.id }
+
+            this.$store.commit('setUser', { user })
+          }).catch(() => console.log('No such document!'))
+        }).catch(() => console.log('No such document!'))
+      })
+    } else {
+      console.log('No such document!')
     }
   }
 }

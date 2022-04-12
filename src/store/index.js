@@ -44,12 +44,18 @@ export default createStore({
         return {
           ...thread,
           get author () {
+            if (!thread) return null
+
             return findById(state.users, thread.userId)
           },
           get repliesCount () {
+            if (!thread) return null
+
             return thread.posts.length - 1
           },
           get contributorsCount () {
+            if (!thread) return null
+
             return thread.contributors.length
           }
         }
