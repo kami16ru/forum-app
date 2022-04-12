@@ -4,7 +4,6 @@ import router from '@/router'
 import store from '@/store'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
-import '@/plugins/firebase'
 
 const forumApp = createApp(App)
 forumApp.use(router)

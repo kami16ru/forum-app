@@ -1,4 +1,6 @@
 export const findById = function (collection, id) {
+  if (!collection) return null
+
   return collection.find(c => c.id === id)
 }
 
