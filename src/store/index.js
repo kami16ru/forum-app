@@ -66,60 +66,31 @@ export default createStore({
   },
   actions: {
     updateUser ({ commit }, user) {
-      commit('setUser', { user, userId: user.id })
+      commit('setItem', { resource: 'users', item: user })
     },
-    fetchThread ({ state, commit }, { id }) {
-      console.log('🔥📄', id)
+    fetchThread ({ dispatch }, { id }) {
+      return dispatch('fetchItem', { resource: 'threads', id, emoji: '📄' })
+    },
+    fetchUser ({ dispatch }, { id }) {
+      return dispatch('fetchItem', { resource: 'users', id, emoji: '🙋' })
+    },
+    fetchPost ({ dispatch }, { id }) {
+      return dispatch('fetchItem', { resource: 'posts', id, emoji: '💬' })
+    },
+    fetchItem ({ state, commit }, { id, emoji, resource }) {
+      console.log('🔥', emoji, id)
 
       return new Promise((resolve) => {
-        const threadDocRef = doc(db, 'threads', id)
+        const docRef = doc(db, resource, id)
 
-        getDoc(threadDocRef)
-          .then(threadDocSnap => {
-            if (threadDocSnap.exists()) {
-              const thread = { ...threadDocSnap.data(), id: threadDocSnap.id }
+        getDoc(docRef)
+          .then(docSnap => {
+            if (docSnap.exists()) {
+              const item = { ...docSnap.data(), id: docSnap.id }
 
-              commit('setThread', { thread })
+              commit('setItem', { resource, id, item })
 
-              resolve(thread)
-            }
-          })
-          .catch(() => console.log('No such document!'))
-      })
-    },
-    fetchUser ({ state, commit }, { id }) {
-      console.log('🔥🙋', id)
-
-      return new Promise((resolve) => {
-        const userDocRef = doc(db, 'users', id)
-
-        getDoc(userDocRef)
-          .then(userDocSnap => {
-            if (userDocSnap.exists()) {
-              const user = { ...userDocSnap.data(), id: userDocSnap.id }
-
-              commit('setUser', { user })
-
-              resolve(user)
-            }
-          })
-          .catch(() => console.log('No such document!'))
-      })
-    },
-    fetchPost ({ state, commit }, { id }) {
-      console.log('🔥💬', id)
-
-      return new Promise((resolve) => {
-        const postDocRef = doc(db, 'posts', id)
-
-        getDoc(postDocRef)
-          .then(postDocSnap => {
-            if (postDocSnap.exists()) {
-              const post = { ...postDocSnap.data(), id: postDocSnap.id }
-
-              commit('setPost', { post })
-
-              resolve(post)
+              resolve(item)
             }
           })
           .catch(() => console.log('No such document!'))
@@ -130,7 +101,7 @@ export default createStore({
       post.userId = state.authId
       post.publishedAt = Math.floor(Date.now() / 1000)
 
-      commit('setPost', { post }) // set the post
+      commit('setItem', { resource: 'posts', item: post }) // set the post
       commit('appendPostToThread', { childId: post.id, parentId: post.threadId })
       commit('appendContributorToThread', { childId: state.authId, parentId: post.threadId })
     },
@@ -140,7 +111,7 @@ export default createStore({
       const publishedAt = Math.floor(Date.now() / 1000)
       const thread = { forumId, title, publishedAt, userId, id }
 
-      commit('setThread', { thread })
+      commit('setItem', { resource: 'threads', item: thread })
       commit('appendThreadToUser', { threadId: id, parentId: userId })
       commit('appendThreadToForum', { childId: id, parentId: forumId })
       dispatch('createPost', { text, threadId: id })
@@ -153,21 +124,15 @@ export default createStore({
       const newThread = { ...thread, title }
       const newPost = { ...post, text }
 
-      commit('setThread', { thread: newThread })
-      commit('setPost', { post: newPost })
+      commit('setItem', { resource: 'threads', item: newThread })
+      commit('setItem', { resource: 'posts', item: newPost })
 
       return findById(state.threads, id)
     }
   },
   mutations: {
-    setUser (state, { user }) {
-      updateOrInsert(state.users, user)
-    },
-    setPost (state, { post }) {
-      updateOrInsert(state.posts, post)
-    },
-    setThread (state, { thread }) {
-      updateOrInsert(state.threads, thread)
+    setItem (state, { resource, item }) {
+      updateOrInsert(state[resource], item)
     },
     appendPostToThread: makeAppendChildToParentMutation({
       parent: 'threads',
