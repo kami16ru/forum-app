@@ -29,9 +29,6 @@ import PostList from '@/components/PostList'
 import PostEditor from '@/components/PostEditor'
 import AppDate from '@/components/AppDate'
 
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '@/plugins/firebase'
-
 export default {
   name: 'PageThreadShow',
   components: {
@@ -70,45 +67,19 @@ export default {
     }
   },
   async created () {
-    const threadDocRef = doc(db, 'threads', this.id)
-    const threadDocSnap = await getDoc(threadDocRef)
+    // fetch the thread
+    const thread = await this.$store.dispatch('fetchThread', { id: this.id })
 
-    if (threadDocSnap.exists()) {
-      const thread = { ...threadDocSnap.data(), id: threadDocSnap.id }
+    // fetch the user
+    this.$store.dispatch('fetchUser', { id: thread.userId })
 
-      this.$store.commit('setThread', { thread })
+    // fetch the posts
+    thread.posts.forEach(async (postId) => {
+      const post = await this.$store.dispatch('fetchPost', { id: postId })
 
-      const userDocRef = doc(db, 'users', thread.userId)
-      const userDocSnap = await getDoc(userDocRef)
-
-      if (userDocSnap.exists()) {
-        const user = { ...userDocSnap.data(), id: userDocSnap.id }
-
-        this.$store.commit('setUser', { user })
-      } else {
-        console.log('No such document!')
-      }
-
-      thread.posts.forEach((postId) => {
-        const postDocRef = doc(db, 'posts', postId)
-
-        getDoc(postDocRef).then((postDocSnap) => {
-          const post = { ...postDocSnap.data(), id: postDocSnap.id }
-
-          this.$store.commit('setPost', { post })
-
-          const userDocRef = doc(db, 'users', post.userId)
-
-          getDoc(userDocRef).then((userDocSnap) => {
-            const user = { ...userDocSnap.data(), id: userDocSnap.id }
-
-            this.$store.commit('setUser', { user })
-          }).catch(() => console.log('No such document!'))
-        }).catch(() => console.log('No such document!'))
-      })
-    } else {
-      console.log('No such document!')
-    }
+      // fetch the user for each post
+      this.$store.dispatch('fetchUser', { id: post.userId })
+    })
   }
 }
 </script>

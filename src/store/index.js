@@ -1,5 +1,7 @@
 import { createStore } from 'vuex'
 import { findById, updateOrInsert } from '@/helpers'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/plugins/firebase'
 
 export default createStore({
   state: {
@@ -65,6 +67,63 @@ export default createStore({
   actions: {
     updateUser ({ commit }, user) {
       commit('setUser', { user, userId: user.id })
+    },
+    fetchThread ({ state, commit }, { id }) {
+      console.log('🔥📄', id)
+
+      return new Promise((resolve) => {
+        const threadDocRef = doc(db, 'threads', id)
+
+        getDoc(threadDocRef)
+          .then(threadDocSnap => {
+            if (threadDocSnap.exists()) {
+              const thread = { ...threadDocSnap.data(), id: threadDocSnap.id }
+
+              commit('setThread', { thread })
+
+              resolve(thread)
+            }
+          })
+          .catch(() => console.log('No such document!'))
+      })
+    },
+    fetchUser ({ state, commit }, { id }) {
+      console.log('🔥🙋', id)
+
+      return new Promise((resolve) => {
+        const userDocRef = doc(db, 'users', id)
+
+        getDoc(userDocRef)
+          .then(userDocSnap => {
+            if (userDocSnap.exists()) {
+              const user = { ...userDocSnap.data(), id: userDocSnap.id }
+
+              commit('setUser', { user })
+
+              resolve(user)
+            }
+          })
+          .catch(() => console.log('No such document!'))
+      })
+    },
+    fetchPost ({ state, commit }, { id }) {
+      console.log('🔥💬', id)
+
+      return new Promise((resolve) => {
+        const postDocRef = doc(db, 'posts', id)
+
+        getDoc(postDocRef)
+          .then(postDocSnap => {
+            if (postDocSnap.exists()) {
+              const post = { ...postDocSnap.data(), id: postDocSnap.id }
+
+              commit('setPost', { post })
+
+              resolve(post)
+            }
+          })
+          .catch(() => console.log('No such document!'))
+      })
     },
     createPost ({ commit, state }, post) {
       post.id = 'qqqq' + Math.random()
