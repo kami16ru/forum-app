@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 import { findById, updateOrInsert } from '@/helpers'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore'
 import { db } from '@/plugins/firebase'
 
 export default createStore({
@@ -77,8 +77,29 @@ export default createStore({
     fetchPost ({ dispatch }, { id }) {
       return dispatch('fetchItem', { resource: 'posts', id, emoji: '💬' })
     },
+    fetchAllCategories ({ commit }) {
+      console.log('🔥', '🏷', 'all')
+
+      return new Promise((resolve) => {
+        getDocs(collection(db, 'categories')).then((querySnapshot) => {
+          const categories = querySnapshot.docs.map((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            const item = { ...doc.data(), id: doc.id }
+
+            commit('setItem', { resource: 'categories', item })
+
+            return item
+          })
+
+          resolve(categories)
+        }).catch(() => console.log('No such document!'))
+      })
+    },
     fetchThreads ({ dispatch }, { ids }) {
       return dispatch('fetchItems', { resource: 'threads', ids, emoji: '📄' })
+    },
+    fetchForums ({ dispatch }, { ids }) {
+      return dispatch('fetchItems', { resource: 'forums', ids, emoji: '🏁' })
     },
     fetchUsers ({ dispatch }, { ids }) {
       return dispatch('fetchItems', { resource: 'users', ids, emoji: '🙋' })
